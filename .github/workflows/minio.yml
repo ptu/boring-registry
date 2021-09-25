@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       minio:
-        image: lazybit/minio
+        image: minio/minio
         ports:
           - 9000:9000
         env:
@@ -22,13 +22,13 @@ jobs:
           - ${{ github.workspace }}/data:/data
         options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
     steps:
-      - name: install minio pyhton module
+      - name: Install minio python module
         run: pip3 install minio
       - name: Setup minio bucket
         run: |
             python3 - <<'EOF'
             from minio import Minio
-            from minio.error import ResponseError
+            from minio.error import InvalidResponseError
 
             try:
                 minio = Minio(
