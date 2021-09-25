@@ -20,7 +20,8 @@ jobs:
           MINIO_SECRET_KEY: citest
         volumes:
           - ${{ github.workspace }}/data:/data
-        options: --name=minio --health-cmd "curl http://minio:9000/minio/health/live"
+        options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
+        command: server /data
     steps:
       - name: Install minio python module
         run: pip3 install minio
