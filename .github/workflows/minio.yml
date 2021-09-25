@@ -34,44 +34,49 @@ jobs:
           docker run -d -p 9000:9000 --name minio \
                      -e "MINIO_ACCESS_KEY=${{ env.MINIO_ADMIN_ACCESS_KEY }}" \
                      -e "MINIO_SECRET_KEY=${{ env.MINIO_ADMIN_SECRET_KEY }}" \
-                     -v /tmp/data:/data \
-                     -v /tmp/config:/root/.minio \
+                     -v ${{ github.workspace }}/data:/data \
+                     -v ${{ github.workspace }}/config:/root/.minio \
                      minio/minio server /data
 
-          export AWS_ACCESS_KEY_ID=${{ env.MINIO_ADMIN_ACCESS_KEY }}
-          export AWS_SECRET_ACCESS_KEY=${{ env.MINIO_ADMIN_SECRET_KEY }}
-          export AWS_EC2_METADATA_DISABLED=true
+      #    export AWS_ACCESS_KEY_ID=${{ env.MINIO_ADMIN_ACCESS_KEY }}
+      #    export AWS_SECRET_ACCESS_KEY=${{ env.MINIO_ADMIN_SECRET_KEY }}
+      #    export AWS_EC2_METADATA_DISABLED=true
 
-          aws --endpoint-url http://127.0.0.1:9000/ s3 mb s3://testbucket
+      #    aws --endpoint-url http://127.0.0.1:9000/ s3 mb s3://testbucket
 
-      - name: Install minio python module
-        run: pip3 install minio
-      - name: Setup minio bucket
-        run: |
-          python3 - <<'EOF'
-          from minio import Minio
-          from minio.error import InvalidResponseError
+      # - name: Install minio python module
+      #   run: pip3 install minio
+      # - name: Setup minio bucket
+      #   run: |
+      #     python3 - <<'EOF'
+      #     from minio import Minio
+      #     from minio.error import InvalidResponseError
 
-          try:
-              minio = Minio(
-                  'localhost:9000',
-                  access_key="${{ env.MINIO_ADMIN_ACCESS_KEY }}",
-                  secret_key="${{ env.MINIO_ADMIN_SECRET_KEY }}",
-                  secure=False
-              )
-          except Exception as ex:
-              raise
+      #     try:
+      #         minio = Minio(
+      #             'localhost:9000',
+      #             access_key="${{ env.MINIO_ADMIN_ACCESS_KEY }}",
+      #             secret_key="${{ env.MINIO_ADMIN_SECRET_KEY }}",
+      #             secure=False
+      #         )
+      #     except Exception as ex:
+      #         raise
           
-          minio.make_bucket("${{ env.BUCKET_NAME }}")
-          print(f'{minio.list_buckets()}')
-          EOF
+      #     minio.make_bucket("${{ env.BUCKET_NAME }}")
+      #     print(f'{minio.list_buckets()}')
+      #     EOF
       - name: Download mc cli
         run: |
           wget -o /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
           chmod +x /usr/local/bin/mc
-      - name: Setup CI user
+      - name: Setup Minio Admin CLI
+        run: mc alias set ghactions http://localhost:9000 ${{ env.MINIO_ADMIN_ACCESS_KEY }} ${{ env.MINIO_ADMIN_SECRET_KEY }}
+      - name: Setup CI Bucket
         run: |
-          mc alias set ghactions http://localhost:9000 ${{ env.MINIO_ADMIN_ACCESS_KEY }} ${{ env.MINIO_ADMIN_SECRET_KEY }}
+          mc mb -p ghactions/${{ env.BUCKET_NAME }}
+      - name: Setup CI User
+        run: |
+          
           mc admin user add ghactions ${{ env.MINIO_ACCESS_KEY }} ${{ env.MINIO_SECRET_KEY }}
           cat > /tmp/policy.json << 'EOF'
           {
