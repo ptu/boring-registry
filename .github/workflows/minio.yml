@@ -8,7 +8,7 @@ on:
 
 jobs:
   minio:
-    name: minio
+    name: Run Tests against Minio
     runs-on: ubuntu-latest
     env:
       MINIO_ACCESS_KEY: citest
