@@ -12,9 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MINIO_ACCESS_KEY: citest
-      MINIO_SECRET_KEY: citest
+      MINIO_SECRET_KEY: citest_secret_key
       MINIO_ADMIN_ACCESS_KEY: minioadmin
       MINIO_ADMIN_SECRET_KEY: minioadmin
+      BUCKET_NAME: testbucket
     # services:
     #   minio:
     #     image: minio/minio
@@ -60,8 +61,35 @@ jobs:
                 )
             except Exception as ex:
                 raise
-
-            minio.make_bucket('foo')
-            minio.make_bucket('bar')
+            
+            minio.make_bucket("${{ env.BUCKET_NAME }}")
             print(f'{minio.list_buckets()}')
             EOF
+        - name: Download mc cli
+          run: |
+            wget -o /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
+            chmod +x /usr/local/bin/mc
+        - name: Setup CI user
+          run: |
+            mc alias set ghactions http://localhost:9000 ${{ env.MINIO_ADMIN_ACCESS_KEY }} ${{ env.MINIO_ADMIN_SECRET_KEY }}
+            mc admin user add ghactions ${{ env.MINIO_ACCESS_KEY }} ${{ env.MINIO_SECRET_KEY }}
+            cat > /tmp/policy.json << 'EOF'
+            {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": [
+                            "s3:*"
+                        ],
+                        "Resource": [
+                            "arn:aws:s3:::${{ env.BUCKET_NAME }}/*",
+                            "arn:aws:s3:::${{ env.BUCKET_NAME }}"
+                        ]
+                    }
+                ]
+            }
+            EOF
+            mc admin policy add ghactions cipolicy /tmp/policy.json
+            mc admin policy set ghactions cipolicy user=${{ env.MINIO_ACCESS_KEY }}
+            mc admin user info ghactions ${{ env.MINIO_ACCESS_KEY }}
