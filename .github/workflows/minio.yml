@@ -67,9 +67,8 @@ jobs:
       #     EOF
       - name: Setup Minio
         run: |
-          wget -o /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
+          wget -O /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
           chmod +x /usr/local/bin/mc
-          file /usr/local/bin/mc
           /usr/local/bin/mc alias set ghactions http://localhost:9000 ${{ env.MINIO_ADMIN_ACCESS_KEY }} ${{ env.MINIO_ADMIN_SECRET_KEY }}
           /usr/local/bin/mc mb -p ghactions/${{ env.BUCKET_NAME }}
           /usr/local/bin/mc admin user add ghactions ${{ env.MINIO_ACCESS_KEY }} ${{ env.MINIO_SECRET_KEY }}
