@@ -65,13 +65,19 @@ jobs:
       #     minio.make_bucket("${{ env.BUCKET_NAME }}")
       #     print(f'{minio.list_buckets()}')
       #     EOF
-      - name: Setup Minio
+      - name: Download mc cli
         run: |
           wget -O /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
           chmod +x /usr/local/bin/mc
-          /usr/local/bin/mc alias set ghactions http://localhost:9000 ${{ env.MINIO_ADMIN_ACCESS_KEY }} ${{ env.MINIO_ADMIN_SECRET_KEY }}
-          /usr/local/bin/mc mb -p ghactions/${{ env.BUCKET_NAME }}
-          /usr/local/bin/mc admin user add ghactions ${{ env.MINIO_ACCESS_KEY }} ${{ env.MINIO_SECRET_KEY }}
+      - name: Setup Minio Admin CLI
+        run: |
+          mc alias set ghactions http://localhost:9000 ${{ env.MINIO_ADMIN_ACCESS_KEY }} ${{ env.MINIO_ADMIN_SECRET_KEY }}
+      - name: Setup CI Bucket
+        run: |
+          mc mb -p ghactions/${{ env.BUCKET_NAME }}
+      - name: Setup CI User
+        run: |
+          mc admin user add ghactions ${{ env.MINIO_ACCESS_KEY }} ${{ env.MINIO_SECRET_KEY }}
           cat > /tmp/policy.json << 'EOF'
           {
               "Version": "2012-10-17",
@@ -89,6 +95,6 @@ jobs:
               ]
           }
           EOF
-          /usr/local/bin/mc admin policy add ghactions cipolicy /tmp/policy.json
-          /usr/local/bin/mc admin policy set ghactions cipolicy user=${{ env.MINIO_ACCESS_KEY }}
-          /usr/local/bin/mc admin user info ghactions ${{ env.MINIO_ACCESS_KEY }}
+          mc admin policy add ghactions cipolicy /tmp/policy.json
+          mc admin policy set ghactions cipolicy user=${{ env.MINIO_ACCESS_KEY }}
+          mc admin user info ghactions ${{ env.MINIO_ACCESS_KEY }}
