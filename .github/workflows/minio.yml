@@ -2,7 +2,7 @@ Name: Minio
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, minio-tests ]
   pull_request:
     branches: [ main ]
 
