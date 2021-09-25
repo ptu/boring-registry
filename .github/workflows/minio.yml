@@ -54,8 +54,8 @@ jobs:
             try:
                 minio = Minio(
                     'localhost:9000',
-                    access_key='${{ env.MINIO_ADMIN_ACCESS_KEY }}',
-                    secret_key='${{ env.MINIO_ADMIN_SECRET_KEY }}',
+                    access_key="${{ env.MINIO_ADMIN_ACCESS_KEY }}",
+                    secret_key="${{ env.MINIO_ADMIN_SECRET_KEY }}",
                     secure=False
                 )
             except Exception as ex:
