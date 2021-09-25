@@ -21,7 +21,6 @@ jobs:
         volumes:
           - ${{ github.workspace }}/data:/data
         options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
-        run: minio server /data
     steps:
       - name: Install minio python module
         run: pip3 install minio
