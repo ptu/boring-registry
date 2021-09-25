@@ -1,4 +1,4 @@
-Name: Minio
+name: Minio
 
 on:
   push:
