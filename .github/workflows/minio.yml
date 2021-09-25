@@ -16,11 +16,11 @@ jobs:
         ports:
           - 9000:9000
         env:
-          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
-          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+          MINIO_ACCESS_KEY: citest
+          MINIO_SECRET_KEY: citest
         volumes:
           - ${{ github.workspace }}/data:/data
-        options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
+        options: --name=minio --health-cmd "curl http://minio:9000/minio/health/live"
     steps:
       - name: Install minio python module
         run: pip3 install minio
@@ -33,8 +33,8 @@ jobs:
             try:
                 minio = Minio(
                     'localhost:9000',
-                    access_key='${{ secrets.MINIO_ACCESS_KEY }}',
-                    secret_key='${{ secrets.MINIO_SECRET_KEY }}',
+                    access_key='${{ env.MINIO_ACCESS_KEY }}',
+                    secret_key='${{ env.MINIO_SECRET_KEY }}',
                     secure=False
                 )
             except Exception as ex:
