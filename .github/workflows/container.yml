@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - "v*"
+  push:
+    branches: [ minio-tests ]
 
 jobs:
   build-container:
