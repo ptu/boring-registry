@@ -22,14 +22,11 @@ jobs:
         ports:
           - 9000:9000
         env:
-          MINIO_ACCESS_KEY: citest
-          MINIO_SECRET_KEY: citest
+          MINIO_ACCESS_KEY: ${{ env.MINIO_ADMIN_ACCESS_KEY }}
+          MINIO_SECRET_KEY: ${{ env.MINIO_ADMIN_SECRET_KEY }}
         volumes:
           - ${{ github.workspace }}/data:/data
-        options:
-          - --name=minio
-          - --health-cmd "curl http://localhost:9000/minio/health/live"
-          - --entrypoint="minio server /data"
+        options: "--name=minio --health-cmd "curl http://localhost:9000/minio/health/live" --entrypoint="minio server /data"
     steps:
       # - name: Setup minio server
       #   run: |
