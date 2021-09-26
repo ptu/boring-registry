@@ -16,27 +16,29 @@ jobs:
       MINIO_ADMIN_ACCESS_KEY: minioadmin
       MINIO_ADMIN_SECRET_KEY: minioadmin
       BUCKET_NAME: testbucket
-    services:
-      minio:
-        image: bitnami/minio
-        ports:
-          - 9000:9000
-        env:
-          MINIO_ROOT_USER: ${{ env.MINIO_ADMIN_ACCESS_KEY }}
-          MINIO_ROOT_PASSWORD: ${{ env.MINIO_ADMIN_SECRET_KEY }}
-        volumes:
-          - ${{ github.workspace }}/data:/data
-          - ${{ github.workspace }}/config:/root/.minio
-        options: '--health-cmd "curl http://localhost:9000/minio/health/live" --health-start-period=10s'
+    # services:
+    #   minio:
+    #     image: bitnami/minio
+    #     ports:
+    #       - 9000:9000
+    #     env:
+    #       MINIO_ROOT_USER: ${{ env.MINIO_ADMIN_ACCESS_KEY }}
+    #       MINIO_ROOT_PASSWORD: ${{ env.MINIO_ADMIN_SECRET_KEY }}
+    #     volumes:
+    #       - ${{ github.workspace }}/data:/data
+    #       - ${{ github.workspace }}/config:/root/.minio
+    #     options: '--health-cmd "curl http://localhost:9000/minio/health/live" --health-start-period=10s'
     steps:
-      # - name: Setup minio server
-      #   run: |
-      #     docker run -d -p 9000:9000 --name minio \
-      #                -e "MINIO_ACCESS_KEY=${{ env.MINIO_ADMIN_ACCESS_KEY }}" \
-      #                -e "MINIO_SECRET_KEY=${{ env.MINIO_ADMIN_SECRET_KEY }}" \
-      #                -v ${{ github.workspace }}/data:/data \
-      #                -v ${{ github.workspace }}/config:/root/.minio \
-      #                minio/minio server /data
+      - name: Setup minio server
+        run: |
+          docker run -d -p 9000:9000 --name minio \
+                     -e "MINIO_ACCESS_KEY=${{ env.MINIO_ADMIN_ACCESS_KEY }}" \
+                     -e "MINIO_SECRET_KEY=${{ env.MINIO_ADMIN_SECRET_KEY }}" \
+                     -e "MINIO_ROOT_USER=${{ env.MINIO_ADMIN_ACCESS_KEY }}" \
+                     -e "MINIO_ROOT_PASSWORD=${{ env.MINIO_ADMIN_SECRET_KEY }}"
+                     -v ${{ github.workspace }}/data:/data \
+                     -v ${{ github.workspace }}/config:/root/.minio \
+                     minio/minio server /data
       - name: Download mc cli
         run: |
           wget -O /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
