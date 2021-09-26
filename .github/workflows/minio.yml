@@ -35,7 +35,7 @@ jobs:
                      -e "MINIO_ACCESS_KEY=${{ env.MINIO_ADMIN_ACCESS_KEY }}" \
                      -e "MINIO_SECRET_KEY=${{ env.MINIO_ADMIN_SECRET_KEY }}" \
                      -e "MINIO_ROOT_USER=${{ env.MINIO_ADMIN_ACCESS_KEY }}" \
-                     -e "MINIO_ROOT_PASSWORD=${{ env.MINIO_ADMIN_SECRET_KEY }}"
+                     -e "MINIO_ROOT_PASSWORD=${{ env.MINIO_ADMIN_SECRET_KEY }}" \
                      -v ${{ github.workspace }}/data:/data \
                      -v ${{ github.workspace }}/config:/root/.minio \
                      minio/minio server /data
