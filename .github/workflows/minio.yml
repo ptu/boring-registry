@@ -26,7 +26,7 @@ jobs:
           MINIO_SECRET_KEY: ${{ env.MINIO_ADMIN_SECRET_KEY }}
         volumes:
           - ${{ github.workspace }}/data:/data
-        options: "--name=minio --health-cmd "curl http://localhost:9000/minio/health/live" --entrypoint="minio server /data"
+        options: '--name=minio --health-cmd "curl http://localhost:9000/minio/health/live" --entrypoint="minio server /data"'
     steps:
       # - name: Setup minio server
       #   run: |
